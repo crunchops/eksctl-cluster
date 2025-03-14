@@ -1,0 +1,105 @@
+# apiVersion: eksctl.io/v1alpha5
+# kind: ClusterConfig
+
+# metadata:
+#   name: eks-spot-cluster
+#   region: us-west-2
+
+# vpc:
+#   id: "vpc-030013dea0d832b71"
+#   cidr: "172.31.0.0/16"
+#   subnets:
+#     public:
+#       us-west-2b: { id: subnet-02ffe5c35f8b088b1 }
+#       us-west-2c: { id: subnet-0c424ee28097003e9 }
+
+# # iam:  
+# #   withOIDC: true
+# #   podIdentityAssociations:
+# #   - namespace: "kube-system"
+# #     serviceAccountName: "ebs-csi-controller-sa"
+# #     createServiceAccount: false
+# #     roleARN: "arn:aws:iam::814200988517:role/demo-ebs-csi-driver-role-for-pod-identity"
+# #     roleName: "demo-ebs-csi-driver-role-for-pod-identity"
+
+# managedNodeGroups:
+#   - name: ng-spot
+#     instanceType: t3.medium
+#     labels: { role: builders }
+#     minSize: 1
+#     maxSize: 3
+#     spot: true
+#     ssh: 
+#       allow: true
+#       publicKeyName: us-west-2-arunlalpn@gmail.com
+#     tags:
+#       Name: ng-spot
+
+# addonsConfig:
+#   autoApplyPodIdentityAssociations: true      
+
+# addons:
+#   - name: aws-ebs-csi-driver
+#     version: latest
+#   - name: eks-pod-identity-agent
+#     version: latest
+    
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eks-spot-cluster
+  region: us-west-2
+  version: "1.30"
+
+vpc:
+  id: "vpc-099dd3481417d3fe8"
+  cidr: "172.31.0.0/16"
+  subnets:
+    public:
+      us-west-2d: { id: subnet-00212fbe880719736 }
+      us-west-2c: { id: subnet-006538decc4e58a2e }
+
+managedNodeGroups:
+  - name: ng-workers
+    availabilityZones: 
+      - us-west-2d 
+    instanceType: t3.small
+    labels: { monitoring: "true" }
+    taints:
+      - key: "monitoring"
+        value: "only"
+        effect: "NoSchedule"
+    minSize: 2
+    maxSize: 4
+    ssh: 
+      allow: true
+      publicKeyName: techiescamp
+    tags:
+      Name: ng-db
+  - name: ng-spot
+    instanceType: t3.medium
+    labels: { role: builders }
+    minSize: 2
+    maxSize: 6
+    spot: true
+    ssh: 
+      allow: true
+      publicKeyName: techiescamp
+    tags:
+      Name: ng-spot
+
+# iam:  
+#   withOIDC: true
+
+addons:
+  - name: aws-ebs-csi-driver
+    version: latest
+  # - name: aws-efs-csi-driver
+  #   version: latest
+  - name: eks-pod-identity-agent
+    version: latest
+
+addonsConfig:    
+   autoApplyPodIdentityAssociations: true

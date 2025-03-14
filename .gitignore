@@ -1,0 +1,9 @@
+*.pem
+*.crt
+*.ovpn
+*.key
+
+aws*
+kar*
+Open*
+ku*
