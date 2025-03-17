@@ -1,0 +1,52 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: private-eks-cluster
+  region: us-west-2
+  version: "1.30"
+
+vpc:
+  id: vpc-0e44c8b34fe0d532b
+  subnets:
+    private:
+      us-west-2a: { id: subnet-0702a6b112eb672d9 }  
+      us-west-2b: { id: subnet-058042ecbed988b94 }
+      us-west-2c: { id: subnet-04abf3a2b834c37a3 }
+    public:
+      us-west-2a: { id: "subnet-015474c9c52f310f1" }  
+      us-west-2b: { id: "subnet-015ad02949389f259" }
+      us-west-2c: { id: "subnet-09ce04061689ccaeb" }
+      
+  publicAccessCIDRs: ["44.244.29.165/32"]
+  clusterEndpoints:
+    privateAccess: true  
+    publicAccess: true
+
+managedNodeGroups:
+  - name: private-nodes
+    instanceTypes: ["t3.medium"]
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 5
+    privateNetworking: true
+    ssh: 
+      enableSsm: true
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+addons:
+  - name: aws-ebs-csi-driver
+    version: latest
+  - name: eks-pod-identity-agent
+    version: latest
+
+addonsConfig:    
+   autoApplyPodIdentityAssociations: true
+
+iam:
+  withOIDC: true
