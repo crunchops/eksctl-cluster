@@ -1,0 +1,32 @@
+name: Manage EKS Cluster
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform (create or delete)'
+        required: true
+        default: 'create'
+        type: choice
+        options:
+          - create
+          - delete
+
+jobs:
+  manage-cluster:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create EKS Cluster
+        if: ${{ inputs.action == 'create' }}
+        run: |
+          echo "Creating EKS cluster..."
+          eksctl create cluster -f private-cluster.yaml
+
+      - name: Delete EKS Cluster
+        if: ${{ inputs.action == 'delete' }}
+        run: |
+          echo "Deleting EKS cluster..."
+          eksctl delete cluster -f private-cluster.yaml
