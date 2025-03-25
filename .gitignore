@@ -7,3 +7,39 @@ aws*
 kar*
 Open*
 ku*
+
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+# *.tfvars
+
+# Crash logs
+crash.log
+
+# Ignore plan files
+*.tfplan
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore Terraform provider cache
+.terraform/
+.terraform.lock.hcl
+
+# Ignore sensitive files
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Ignore backup files
+*.bak
+
+# Ignore any temporary files created by the editor
+*.swp
+*.swo
+*.tmp
+*.DS_Store
