@@ -43,3 +43,5 @@ terraform.tfvars
 *.swo
 *.tmp
 *.DS_Store
+
+infra-apps
