@@ -9,15 +9,15 @@ metadata:
     karpenter.sh/discovery: dev-onebot-eks-cluster-v2
 
 vpc:
-  id: vpc-0299477e8eb79eca3
+  id: vpc-0c29cbcedcce79bb1
   subnets:
     private:
-      us-east-1a: { id: subnet-0b512423dd732bf94 }  
-      us-east-1b: { id: subnet-0ba053c1a51c8c442 }
-      us-east-1c: { id: subnet-08f38448bb36a92bf }
+      us-east-1a: { id: subnet-0272b68cca109c1f2 }  
+      us-east-1b: { id: subnet-0378671215219ca68 }
+      us-east-1c: { id: subnet-0cd7b8f06b59893ce }
 
   publicAccessCIDRs:
-    - "49.206.0.20/32"
+    - "49.206.7.3/32"
   clusterEndpoints:
     privateAccess: true  
     publicAccess: true
