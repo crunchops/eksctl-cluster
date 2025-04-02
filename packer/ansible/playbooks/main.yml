@@ -1,0 +1,8 @@
+---
+- name: Setup Pritunl VPN server
+  hosts: all
+  become: true
+  roles:
+    - common
+    - vpn
+    - kubernetes

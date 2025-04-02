@@ -1,0 +1,6 @@
+---
+- name: Install and Configure OpenVPN
+  hosts: all
+  become: true
+  roles:
+    - vpn

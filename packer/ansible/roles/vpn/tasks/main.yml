@@ -1,0 +1,94 @@
+---
+- name: Configure MongoDB repository
+  ansible.builtin.copy:
+    content: "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse"
+    dest: /etc/apt/sources.list.d/mongodb-org.list
+    owner: root
+    group: root
+    mode: '0644'
+  register: mongodb_repo_result
+  failed_when: mongodb_repo_result.rc is defined and mongodb_repo_result.rc != 0
+
+- name: Configure OpenVPN repository
+  ansible.builtin.copy:
+    content: "deb [ signed-by=/usr/share/keyrings/openvpn-repo.gpg ] https://build.openvpn.net/debian/openvpn/stable noble main"
+    dest: /etc/apt/sources.list.d/openvpn.list
+    owner: root
+    group: root
+    mode: '0644'
+  register: openvpn_repo_result
+  failed_when: openvpn_repo_result.rc is defined and openvpn_repo_result.rc != 0
+
+- name: Configure Pritunl repository
+  ansible.builtin.copy:
+    content: "deb [ signed-by=/usr/share/keyrings/pritunl.gpg ] https://repo.pritunl.com/stable/apt noble main"
+    dest: /etc/apt/sources.list.d/pritunl.list
+    owner: root
+    group: root
+    mode: '0644'
+  register: pritunl_repo_result
+  failed_when: pritunl_repo_result.rc is defined and pritunl_repo_result.rc != 0
+
+- name: Install gnupg
+  ansible.builtin.apt:
+    name: gnupg
+    state: present
+    update_cache: no
+  register: gnupg_result
+  failed_when: gnupg_result.failed is defined and gnupg_result.failed
+
+- name: Import MongoDB GPG key
+  ansible.builtin.shell:
+    cmd: "curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-8.0.gpg --yes"
+    creates: /usr/share/keyrings/mongodb-server-8.0.gpg
+  register: mongodb_key_result
+  changed_when: mongodb_key_result.rc == 0
+
+- name: Import OpenVPN GPG key
+  ansible.builtin.shell:
+    cmd: "curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor -o /usr/share/keyrings/openvpn-repo.gpg --yes"
+    creates: /usr/share/keyrings/openvpn-repo.gpg
+  register: openvpn_key_result
+  changed_when: openvpn_key_result.rc == 0
+
+- name: Import Pritunl GPG key
+  ansible.builtin.shell:
+    cmd: "curl -fsSL https://raw.githubusercontent.com/pritunl/pgp/master/pritunl_repo_pub.asc | gpg --dearmor -o /usr/share/keyrings/pritunl.gpg --yes"
+    creates: /usr/share/keyrings/pritunl.gpg
+  register: pritunl_key_result
+  changed_when: pritunl_key_result.rc == 0
+
+- name: Update APT cache
+  ansible.builtin.apt:
+    update_cache: yes
+  register: apt_update_result
+  failed_when: apt_update_result.failed is defined and apt_update_result.failed
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - pritunl
+      - openvpn
+      - mongodb-org
+      - wireguard
+      - wireguard-tools
+    state: present
+  register: packages_result
+  failed_when: packages_result.failed is defined and packages_result.failed
+
+- name: Disable UFW firewall
+  ansible.builtin.ufw:
+    state: disabled
+  register: ufw_result
+  failed_when: ufw_result.failed is defined and ufw_result.failed
+
+- name: Ensure Pritunl and MongoDB services are started and enabled
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - pritunl
+    - mongod
+  register: service_result
+  failed_when: service_result.failed is defined and service_result.failed
